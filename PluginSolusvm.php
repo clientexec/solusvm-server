@@ -490,8 +490,9 @@ Class PluginSolusvm extends ServerPlugin {
     }
 
 
-    function getDirectLink($userPackage)
+    function getDirectLink($userPackage, $getRealLink = true)
     {
+        //$getRealLink will not be used here. Will always return the real link
         $args = $this->buildParams($userPackage);
         $this->setup($args);
         $this->view->packageId = $userPackage->id;
