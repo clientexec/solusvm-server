@@ -450,6 +450,20 @@ Class PluginSolusvm extends ServerPlugin {
         return $this->call($params, $args);
     }
 
+    function getVServerState($args, $id)
+    {
+        $userPackage = new UserPackage($args['userPackageId']);
+        $args = $this->buildParams($userPackage);
+        $this->setup($args);
+
+        $params = array();
+
+        $params['action'] = 'vserver-infoall';
+        $params['vserverid'] = $id;
+
+        return $this->call($params, $args);
+    }
+
 
     function testConnection($args)
     {
