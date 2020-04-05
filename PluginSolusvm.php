@@ -10,7 +10,8 @@ require_once 'modules/admin/models/ServerPlugin.php';
 * @email matt@clientexec.com
 */
 
-Class PluginSolusvm extends ServerPlugin {
+class PluginSolusvm extends ServerPlugin
+{
 
     public $features = array(
         'packageName' => true,
@@ -24,9 +25,11 @@ Class PluginSolusvm extends ServerPlugin {
     var $key;
     var $url;
 
-    function setup ( $args ) {
-        if ( isset($args['server']['variables']['ServerHostName']) && isset($args['server']['variables']['plugin_solusvm_ID']) && isset($args['server']['variables']['plugin_solusvm_Key']) ) {
-            if ( $args['server']['variables']['plugin_solusvm_Port'] == '' ) {
+
+    function setup($args)
+    {
+        if (isset($args['server']['variables']['ServerHostName']) && isset($args['server']['variables']['plugin_solusvm_ID']) && isset($args['server']['variables']['plugin_solusvm_Key'])) {
+            if ($args['server']['variables']['plugin_solusvm_Port'] == '') {
                 $args['server']['variables']['plugin_solusvm_Port'] = 5656;
             }
             $this->host = $args['server']['variables']['ServerHostName'];
@@ -38,29 +41,33 @@ Class PluginSolusvm extends ServerPlugin {
         }
     }
 
-    function email_error ( $name, $message, $params, $args ) {
+    function email_error($name, $message, $params, $args)
+    {
         $error = "SolusVM Account " .$name." Failed. ";
         $error .= "An email with the Details was sent to ". $args['server']['variables']['plugin_solusvm_Failure_E-mail'].'<br /><br />';
 
-        if ( is_array($message) ) {
-            $message = implode ( "\n", trim($message) );
+        if (is_array($message)) {
+            $message = implode("\n", trim($message));
         }
 
         CE_Lib::log(1, 'SolusVM Error: '.print_r(array('type' => $name, 'error' => $error, 'message' => $message, 'params' => $params, 'args' => $args), true));
 
-        if ( !empty($args['server']['variables']['plugin_solusvm_Failure_E-mail']) ) {
+        if (!empty($args['server']['variables']['plugin_solusvm_Failure_E-mail'])) {
             $mailGateway = new NE_MailGateway();
-            $mailGateway->mailMessageEmail( $message,
-            $args['server']['variables']['plugin_solusvm_Failure_E-mail'],
-            "SolusVM Plugin",
-            $args['server']['variables']['plugin_solusvm_Failure_E-mail'],
-            "",
-            "SolusVM Account ".$name." Failure");
+            $mailGateway->mailMessageEmail(
+                $message,
+                $args['server']['variables']['plugin_solusvm_Failure_E-mail'],
+                "SolusVM Plugin",
+                $args['server']['variables']['plugin_solusvm_Failure_E-mail'],
+                "",
+                "SolusVM Account ".$name." Failure"
+            );
         }
         return $error.nl2br($message);
     }
 
-    function getVariables() {
+    function getVariables()
+    {
 
         $variables = array (
             lang("Name") => array (
@@ -90,6 +97,18 @@ Class PluginSolusvm extends ServerPlugin {
                 "description"=>lang("API Port"),
                 "value"=>"5656"
             ),
+            lang("Htpasswd Username") => array (
+                "type"=>"text",
+                "description"=>lang("Enter the htpassword username if you have secured your API via htpasswd."),
+                "value"=>"",
+                "encryptable"=>true
+            ),
+            lang("Htpasswd Password") => array (
+                "type"=>"password",
+                "description"=>lang("Enter the htpasswd password if you have secured your API via htpasswd."),
+                "value"=>"",
+                "encryptable"=>true
+            ),
             lang("VM Username Custom Field") => array(
                 "type"        => "text",
                 "description" => lang("Enter the name of the package custom field that will hold the SolusVM Username. This field should not be included in sign up."),
@@ -108,6 +127,11 @@ Class PluginSolusvm extends ServerPlugin {
             lang("VM Operating System Custom Field") => array(
                 "type"        => "text",
                 "description" => lang("Enter the name of the package custom field that will hold the VM Operating System for SolusVM."),
+                "value"       => ""
+            ),
+            lang("VM Location Custom Field") => array(
+                "type"        => "text",
+                "description" => lang("Enter the name of the package custom field that will hold the Location (Node Group ID) for SolusVM.  This is an optional setting only used if you have multiple locations/nodes"),
                 "value"       => ""
             ),
             lang("Failure E-mail") => array (
@@ -169,11 +193,12 @@ Class PluginSolusvm extends ServerPlugin {
         return $variables;
     }
 
-    function validateCredentials($args) {
-
+    function validateCredentials($args)
+    {
     }
 
-    function doDelete($args) {
+    function doDelete($args)
+    {
         $userPackage = new UserPackage($args['userPackageId']);
         $args = $this->buildParams($userPackage);
         $this->delete($args);
@@ -181,7 +206,8 @@ Class PluginSolusvm extends ServerPlugin {
         return $VM_Hostname . ' has been deleted.';
     }
 
-    function doTUNTAP($args) {
+    function doTUNTAP($args)
+    {
         $userPackage = new UserPackage($args['userPackageId']);
         $args = $this->buildParams($userPackage);
         $this->enableTunTap($args);
@@ -189,7 +215,8 @@ Class PluginSolusvm extends ServerPlugin {
         return $VM_Hostname . ' has has TUN/TAP enabled.';
     }
 
-    function doCreate($args) {
+    function doCreate($args)
+    {
         $userPackage = new UserPackage($args['userPackageId']);
         $args = $this->buildParams($userPackage);
         $this->create($args);
@@ -197,7 +224,8 @@ Class PluginSolusvm extends ServerPlugin {
         return $VM_Hostname . ' has been created.';
     }
 
-    function doSuspend($args) {
+    function doSuspend($args)
+    {
         $userPackage = new UserPackage($args['userPackageId']);
         $args = $this->buildParams($userPackage);
         $this->suspend($args);
@@ -205,7 +233,8 @@ Class PluginSolusvm extends ServerPlugin {
         return $VM_Hostname . ' has been suspended.';
     }
 
-    function doUnSuspend($args) {
+    function doUnSuspend($args)
+    {
         $userPackage = new UserPackage($args['userPackageId']);
         $args = $this->buildParams($userPackage);
         $this->unsuspend($args);
@@ -213,7 +242,8 @@ Class PluginSolusvm extends ServerPlugin {
         return $VM_Hostname . ' has been unsuspended.';
     }
 
-    function doReboot($args) {
+    function doReboot($args)
+    {
         $userPackage = new UserPackage($args['userPackageId']);
         $args = $this->buildParams($userPackage);
         $this->reboot($args);
@@ -221,7 +251,8 @@ Class PluginSolusvm extends ServerPlugin {
         return $VM_Hostname . ' has been rebooted.';
     }
 
-    function doBoot($args) {
+    function doBoot($args)
+    {
         $userPackage = new UserPackage($args['userPackageId']);
         $args = $this->buildParams($userPackage);
         $this->boot($args);
@@ -229,7 +260,8 @@ Class PluginSolusvm extends ServerPlugin {
         return $VM_Hostname . ' has been booted.';
     }
 
-    function doShutdown($args) {
+    function doShutdown($args)
+    {
         $userPackage = new UserPackage($args['userPackageId']);
         $args = $this->buildParams($userPackage);
         $this->shutdown($args);
@@ -237,7 +269,8 @@ Class PluginSolusvm extends ServerPlugin {
         return $VM_Hostname . ' has been shutdown.';
     }
 
-    function enableTunTap($args) {
+    function enableTunTap($args)
+    {
         $this->setup($args);
         $params = array();
 
@@ -247,7 +280,8 @@ Class PluginSolusvm extends ServerPlugin {
         $request = $this->call($params, $args);
     }
 
-    function boot($args) {
+    function boot($args)
+    {
         $this->setup($args);
         $params = array();
 
@@ -257,7 +291,8 @@ Class PluginSolusvm extends ServerPlugin {
         $request = $this->call($params, $args);
     }
 
-    function shutdown($args) {
+    function shutdown($args)
+    {
         $this->setup($args);
         $params = array();
 
@@ -267,7 +302,8 @@ Class PluginSolusvm extends ServerPlugin {
         $request = $this->call($params, $args);
     }
 
-    function reboot($args) {
+    function reboot($args)
+    {
         $this->setup($args);
         $params = array();
 
@@ -277,7 +313,8 @@ Class PluginSolusvm extends ServerPlugin {
         $request = $this->call($params, $args);
     }
 
-    function unsuspend($args) {
+    function unsuspend($args)
+    {
         $this->setup($args);
         $params = array();
 
@@ -287,7 +324,8 @@ Class PluginSolusvm extends ServerPlugin {
         $request = $this->call($params, $args);
     }
 
-    function suspend($args) {
+    function suspend($args)
+    {
         $this->setup($args);
         $params = array();
 
@@ -297,7 +335,8 @@ Class PluginSolusvm extends ServerPlugin {
         $request = $this->call($params, $args);
     }
 
-    function delete($args) {
+    function delete($args)
+    {
         $this->setup($args);
         $params = array();
 
@@ -312,7 +351,8 @@ Class PluginSolusvm extends ServerPlugin {
         $userPackage->setCustomField('Server Acct Properties', '');
     }
 
-    function getAvailableActions($userPackage) {
+    function getAvailableActions($userPackage)
+    {
         $args = $this->buildParams($userPackage);
         $this->setup($args);
         $actions = array();
@@ -325,13 +365,13 @@ Class PluginSolusvm extends ServerPlugin {
         try {
             $request = $this->call($params, $args);
             $actions[] = 'Delete';
-            if ( $request['statusmsg'] == 'disabled' ) {
+            if ($request['statusmsg'] == 'disabled') {
                 $actions[] = 'UnSuspend';
             } else {
                 $actions[] = 'Suspend';
                 $actions[] = 'Reboot';
                 $actions[] = 'TUNTAP';
-                if ( $request['statusmsg'] == 'offline' ) {
+                if ($request['statusmsg'] == 'offline') {
                     $actions[] = 'Boot';
                 } else {
                     $actions[] = 'Shutdown';
@@ -344,7 +384,8 @@ Class PluginSolusvm extends ServerPlugin {
         return $actions;
     }
 
-    function create($args) {
+    function create($args)
+    {
         $this->setup($args);
         $userPackage = new UserPackage($args['package']['id']);
 
@@ -360,11 +401,17 @@ Class PluginSolusvm extends ServerPlugin {
         $params['company'] = $args['customer']['organization'];
         try {
             $result = $this->call($params, $args);
-        } catch ( Exception $e ) {
+        } catch (Exception $e) {
             // If the message is that the client already exists, we can ignore it...
-            if ( $e->getMessage() != 'Client already exists' ) {
+            if ($e->getMessage() != 'Client already exists') {
                 throw new CE_Exception($e->getMessage());
             }
+        }
+
+        // get the node group from the package variable, but allow a custom location field to override if configured.
+        $nodeGroupId = $args['package']['variables']['node_group'];
+        if ($args['server']['variables']['plugin_solusvm_VM_Location_Custom_Field'] != '') {
+            $nodeGroupId = $userPackage->getCustomField($args['server']['variables']['plugin_solusvm_VM_Location_Custom_Field'], CUSTOM_FIELDS_FOR_PACKAGE);
         }
 
         // create the server
@@ -375,7 +422,7 @@ Class PluginSolusvm extends ServerPlugin {
         $params['username'] = $username;
         $params['password'] = html_entity_decode($userPackage->getCustomField($args['server']['variables']['plugin_solusvm_VM_Password_Custom_Field'], CUSTOM_FIELDS_FOR_PACKAGE));
         $params['plan'] = $args['package']['name_on_server'];
-        $params['nodegroup'] = $args['package']['variables']['node_group'];
+        $params['nodegroup'] = $nodeGroupId;
         $params['ips'] = $args['package']['variables']['num_of_ips'];
         $params['template'] = $userPackage->getCustomField($args['server']['variables']['plugin_solusvm_VM_Operating_System_Custom_Field'], CUSTOM_FIELDS_FOR_PACKAGE);
 
@@ -392,8 +439,7 @@ Class PluginSolusvm extends ServerPlugin {
 
     function call($params, $args)
     {
-        if ( !function_exists('curl_init') )
-        {
+        if (!function_exists('curl_init')) {
             throw new CE_Exception('cURL is required in order to connect to SolusVM');
         }
 
@@ -413,10 +459,15 @@ Class PluginSolusvm extends ServerPlugin {
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+
+        if ($args['server']['variables']['plugin_solusvm_Htpasswd Username'] != '' && $args['server']['variables']['plugin_solusvm_Htpasswd Password'] != '') {
+            $htpasswdUser = $args['server']['variables']['plugin_solusvm_Htpasswd Username'];
+            $htpasswdPassword = $args['server']['variables']['plugin_solusvm_Htpasswd Password'];
+            curl_setopt($ch, CURLOPT_USERPWD, $htpasswdUser . ':' . $htpasswdPassword);
+        }
         $data = curl_exec($ch);
 
-        if ( $data === false )
-        {
+        if ($data === false) {
             $error = "SolusVM API Request / cURL Error: ".curl_error($ch);
             CE_Lib::log(4, $error);
             throw new CE_Exception($error);
@@ -429,10 +480,10 @@ Class PluginSolusvm extends ServerPlugin {
             $result[$y] = $match[2][$x];
         }
 
-        if ( $result['status'] == 'error' ) {
+        if ($result['status'] == 'error') {
             CE_Lib::log(4, 'SolusVM Error: ' . $result['statusmsg']);
             // don't e-mail about a status fail
-            if ( $params['action'] != 'vserver-status' && $result['statusmsg'] != 'Client already exists' ) {
+            if ($params['action'] != 'vserver-status' && $result['statusmsg'] != 'Client already exists') {
                 $this->email_error($params['action'], $result['statusmsg'], $params, $args);
             }
             throw new CE_Exception($result['statusmsg']);
@@ -485,18 +536,19 @@ Class PluginSolusvm extends ServerPlugin {
 
         $params = array();
         $params['action'] = 'client-key-login';
-        $params['username'] = 'ce' . $args['customer']['id'];;
+        $params['username'] = 'ce' . $args['customer']['id'];
+        ;
         $params['vserverid'] = $userPackage->getCustomField('Server Acct Properties');
         $params['returnurl'] = CE_Lib::getSoftwareURL() . '/index.php?fuse=clients&controller=products&view=product&id=' . $userPackage->id;
 
         // we do not want to show the client the error message from solus, so try/catch this
         try {
             $result = $this->call($params, $args);
-        } catch (Exception $e ) {
+        } catch (Exception $e) {
             return array();
         }
 
-        if ($result['status'] == 'success' ) {
+        if ($result['status'] == 'success') {
             return array('hasha' => $result['hasha'], 'hashb' => $result['hashb']);
         } else {
             return array();
