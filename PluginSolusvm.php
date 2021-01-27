@@ -556,7 +556,7 @@ class PluginSolusvm extends ServerPlugin
     }
 
 
-    function getDirectLink($userPackage, $getRealLink = true)
+    function getDirectLink($userPackage, $getRealLink = true, $fromAdmin = false)
     {
         //$getRealLink will not be used here. Will always return the real link
         $args = $this->buildParams($userPackage);
@@ -564,10 +564,29 @@ class PluginSolusvm extends ServerPlugin
         $this->view->packageId = $userPackage->id;
         $this->view->serverURL = "https://{$this->host}:{$args['server']['variables']['plugin_solusvm_Port']}/auth.php";
         $form = $this->view->render('login.phtml');
+        $linkText = $this->user->lang('Login to SolusVM');
 
-        return array(
-            'link' => '<li><a href="#" onclick="loginToSolusVM(); return false">' . $this->user->lang('Login to SolusVM') . '</a></li>',
-            'form' => $form
-        );
+        if ($fromAdmin) {
+             $cmd = 'panellogin';
+              return [
+                'cmd' => $cmd,
+                'label' => $linkText
+              ];
+        } else {
+            return array(
+                'link' => '<li><a href="#" onclick="loginToSolusVM(); return false">' . $linkText . '</a></li>',
+                'form' => $form
+            );
+        }
+    }
+
+    function dopanellogin($args)
+    {
+        $hash = $this->doauthenticateClient($args);
+        $userPackage = new UserPackage($args['userPackageId']);
+        $args = $this->buildParams($userPackage);
+
+        $link = "https://{$this->host}:{$args['server']['variables']['plugin_solusvm_Port']}/auth.php?_a={$hash['hasha']}&_b={$hash['hashb']}";
+        return $link;
     }
 }
