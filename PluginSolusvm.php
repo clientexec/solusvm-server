@@ -573,6 +573,14 @@ class PluginSolusvm extends ServerPlugin
                 'label' => $linkText
               ];
         } else {
+            return [
+                'fa' => 'fa fa-user fa-fw',
+                'link' => '',
+                'text' => $linkText,
+                'form' => $form,
+                'onclick' => 'loginToSolusVM(); return false'
+            ];
+
             return array(
                 'link' => '<li><a href="#" onclick="loginToSolusVM(); return false">' . $linkText . '</a></li>',
                 'form' => $form
